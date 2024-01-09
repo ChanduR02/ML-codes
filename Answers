@@ -1,0 +1,106 @@
+1.KMeans
+from sklearn.cluster import KMeans
+from sklearn.datasets import make_blobs
+import matplotlib.pyplot as plt
+x,y=make_blobs(n_samples=300,centers=4,cluster_std=0.60,random_state=0)
+k_means=KMeans(n_clusters=4)
+k_means.fit(x)
+plt.scatter(x[:,0],x[:,1],c=k_means.labels_,cmap='viridis')
+plt.scatter(k_means.cluster_centers_[:,0],k_means.cluster_centers_[:,1],marker='x',s=200,linewidths=3,color='r')
+plt.show()
+  
+2.S-Algorithm
+import numpy as np
+x=np.array([['sunny','warm','normal','strong','warm','same'],
+           ['sunny','warm','high','strong','warm','same'],
+           ['rainy','warm','high','strong','warm','clange'],
+           ['sunny','warm','high','strong','cool','clange']])
+y=np.array(('+','+','-','+'))
+hypothesis=['0','0','0','0','0','0']
+for i in range(len(y)):
+    if y[i]=='+':
+        for j in range(len(x[i])):
+            if hypothesis[j]=='0':
+                hypothesis[j]=x[i][j]
+            elif hypothesis[j]!=x[i][j]:
+                hypothesis[j]='?'
+print("most specific hypothesis:",hypothesis)
+
+3.Non-Parametric
+import numpy as np
+import statsmodels.api as sm
+x=np.linspace(0,2*np.pi,100)
+y=np.sin(x)+np.random.normal(scale=0.1,size=100)
+bandwidth=0.3
+lowess=sm.nonparametric.lowess(y,x,frac=bandwidth)
+import matplotlib.pyplot as plt
+plt.scatter(x,y)
+plt.plot(lowess[:,0],lowess[:,1],color='red')
+plt.show()
+
+4.Naive Bayes
+from sklearn.datasets import load_iris
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+iris = load_iris()
+x_train, x_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.3, random_state=2)
+
+# Create a Gaussian Naive Bayes classifier object
+grab = GaussianNB()
+
+# Fit the classifier to the training data
+grab.fit(x_train, y_train)
+
+# Make predictions on the test set
+y_pred = grab.predict(x_test)
+
+# Calculate the accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+
+5.SVM
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+dataset=pd.read_csv('C:/Users/Chandu Reddy/Desktop/hello/Social_Network_Ads.csv')
+dataset.head()
+x=dataset.iloc[:,[2,3]].values
+y=dataset.iloc[:,4].values
+
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.25,random_state=0)
+
+from sklearn.preprocessing import StandardScaler
+sc=StandardScaler()
+x_train=sc.fit_transform(x_train)
+x_test=sc.transform(x_test)
+
+from sklearn.svm import SVC
+classifier=SVC(kernel='rbf',random_state=0)
+classifier.fit(x_train,y_train)
+y_pred=classifier.predict(x_test)
+
+from sklearn.metrics import confusion_matrix,accuracy_score
+cm=confusion_matrix(y_test,y_pred)
+print(cm)
+
+from matplotlib.colors import ListedColormap
+x_set, y_set = x_test, y_test
+x1, x2 = np.meshgrid(np.arange(start = x_set[:, 0].min() - 1, stop = x_set[:, 0].max() + 1, step = 0.01),
+ np.arange(start = x_set[:, 1].min() - 1, stop = x_set[:, 1].max() + 1, step = 0.01))
+plt.contourf(x1, x2, classifier.predict(np.array([x1.ravel(), x2.ravel()]).T).reshape(x1.shape),
+ alpha = 0.75, cmap = ListedColormap(('red', 'green')))
+plt.xlim(x1.min(), x1.max())
+plt.ylim(x2.min(), x2.max())
+for i, j in enumerate(np.unique(y_set)):
+    plt.scatter(x_set[y_set == j, 0], x_set[y_set == j, 1],
+ c = ListedColormap(('red', 'green'))(i), label = j)
+plt.title('SVM (Test set)')
+plt.xlabel('Age')
+plt.ylabel('Estimated Salary')
+plt.legend()
+plt.show()
